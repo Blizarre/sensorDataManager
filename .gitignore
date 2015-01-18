@@ -2,6 +2,9 @@
 logs
 *.log
 
+# sublime Text workspace
+*.sublime-workspace
+
 # Runtime data
 pids
 *.pid
