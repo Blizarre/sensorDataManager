@@ -9,4 +9,3 @@ SensorLogger.js will poll the file containing sensor data and output it to cvs f
 
 needs node.js modules (npm install <moduleName>):
  - minimist
- - node-commandline
