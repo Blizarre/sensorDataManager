@@ -6,9 +6,10 @@ var userMngr = require('./userMngr.js');
 var dataMngr = require('./dataMngr.js');
 
 var connectSql = mysql.createConnection({
-       host     : 'localhost',
-       user     : 'sensorLogger',
-       password : 'otter&42Loutre'
+        host     : 'localhost',
+        user     : 'sensorLogger',
+        password : 'otter&42Loutre',
+        database : 'sensorLogger',
     });
 connectSql.connect();
 
@@ -18,33 +19,38 @@ function mainServerParser(req, res) {
     console.log(page);
     console.log(" ");
     console.log(req.headers);
-    console.log(" ");
-    console.log(req.headers['host']);
+
     if (page == '/') {
     	res.writeHead(400);
         res.write('This service is not to be used this way.');
     }
-    else if (page == '/get_userid') {
-	var authStatus=userMngr.checkAuth(connectSql)
-	if (authStatus>=0)
+    else if (page == '/get_userid')
+    {
+	userMngr.getUserId(connectSql, req.headers, function (authStatus)
 	{
-    	    res.writeHead(200);
-            res.write('{"UserID" :'+ authStatus +'}');
-	}
-	else if (authStatus==-1) 
-	{
-    	    res.writeHead(400);
-	}
-	else if (authStatus==-2) 
-	{
-    	    res.writeHead(404);
-	}
-	else 
-	{
-    	    res.writeHead(500);
-	}
+	    if (authStatus>=0)
+	    {
+    	        res.writeHead(200);
+                res.write('{"UserID" :'+ authStatus +'}');
+    		res.end();
+	    }
+	    else if (authStatus==-1) 
+	    {
+    	        res.writeHead(400);
+    		res.end();
+	    }
+	    else if (authStatus==-2) 
+	    {
+    	        res.writeHead(401);
+    		res.end();
+	    }
+	    else 
+	    {
+    	        res.writeHead(500);
+    		res.end();
+	    }
+	});
     }
-
     else if (page == '/create_user') {
     	res.writeHead(200);
         res.write('{"UserID" : 69}');
@@ -86,7 +92,6 @@ function mainServerParser(req, res) {
     	res.writeHead(404);
     }
  
-    res.end();
 }
 
 
