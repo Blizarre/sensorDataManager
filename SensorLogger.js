@@ -1,20 +1,29 @@
+"use strict";
+
 var fs = require('fs');
 var minimist = require('minimist');
 var endOfLine = require('os').EOL;
 var SensorDataFile = require('./SensorDataFile.js');
 
 function validateArgs() {
-	var args = minimist(process.argv.slice(2), { "default": { "interval":15000, "maxRecordPerFile":2 }, "string":["sensorFile"]} );
-	
-	console.log(args);
+	var args = minimist(process.argv.slice(2), {
+		"default": {
+			"interval": 15000,
+			"maxRecordPerFile": 2
+		},
+		"string": ["sensorFile"]
+	});
 
-	if (!args.sensorFile)
-	{
+	if (args.help || args._.length !== 0) {
+		console.error( "Usage: node " + process.argv[1] + " --sensorFile <fileName> --sensorId <string> [ --interval <sampling interval in s.> --maxRecordPerFile <int> ]");
+		process.exit();
+		}
+
+	if (!args.sensorFile) {
 		throw "--sensorFile required";
 	}
 
-	if (!args.sensorId)
-	{
+	if (!args.sensorId) {
 		throw "--sensorId required";
 	}
 	args.outputLogFile = args.outputLogFile || "out{timestamp}.csv";
@@ -22,28 +31,35 @@ function validateArgs() {
 	return args;
 }
 
-function parseSensorData(args) {
-	
-	var match, value;
-	var data = fs.readFileSync(args.sensorFile, { "encoding": "utf-8" });
+function parseSensorData(args, callback) {
+	var value;
+	fs.readFile(args.sensorFile, {
+		"encoding": "utf-8"
+	}, function(err, data) {
+		if (err)
+			throw err;
 
-	if (data.match(/crc=.* YES/)) {
-		match = data.match(/t=(\d+)/);
-		if (match) {
-			value = parseFloat(match[1]) / 1000.0;
+		if (data.match(/crc=.* YES/)) {
+			var strValue = data.match(/t=(\d+)/);
+			if (strValue) {
+				value = parseFloat(strValue[1]) / 1000.0;
+				callback(value);
+			} else
+				throw "Invalid data";
 		} else
-			throw "Invalid data";
-	} else
-		throw "CRC not OK";
-	return value;
+			throw "CRC Error";
+	});
 }
 
-function extractAndStoreValue(args)
-{
+
+function extractAndStoreValue(args, sensorFile) {
 	try {
-		var value = parseSensorData(args);
-		console.log("Value read: " + value);
-		sensorFile.addData([args.sensorId, value, new Date().toISOString()].join(";") + endOfLine);
+		parseSensorData(args, function(value)
+			{
+				console.log("Value read: " + value);
+				sensorFile.addData([args.sensorId, value, new Date().toISOString()].join(";") + endOfLine);
+			}
+		);
 	} catch (e) {
 		console.error(e);
 	}
@@ -52,8 +68,10 @@ function extractAndStoreValue(args)
 var args = validateArgs();
 var sensorFile = new SensorDataFile(args.outputLogFile, args.maxRecordPerFile);
 
-extractAndStoreValue(args);
-setInterval(function() {
-	extractAndStoreValue(args);
-}, args.interval);
-
+extractAndStoreValue(args, sensorFile);
+setInterval(
+	function() {
+		extractAndStoreValue(args, sensorFile);
+	},
+	args.interval
+);
