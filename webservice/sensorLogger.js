@@ -36,7 +36,7 @@ function mainServerParser(req, res) {
 	    }
 	    else if (authStatus==-1) 
 	    {
-    	        res.writeHead(400);
+    	        res.writeHead(401);
     		res.end();
 	    }
 	    else if (authStatus==-2) 
