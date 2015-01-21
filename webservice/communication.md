@@ -10,6 +10,7 @@ Incorrect auth data will result in a 401 error. _Later_ a cookie style auth can 
 Server error are not presents in the following response HTTP codes but can occur.
 
 ## Create user
+(not implemented yet, todo)
 POST {baseUrl}/create_user
 
 |  | Request          | Header          |
@@ -19,6 +20,7 @@ POST {baseUrl}/create_user
 | Body |  | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
 
 ## Delete user
+(not implemented yet, todo)
 POST {baseUrl}/delete_user
 
 |  | Request          | Header          |
@@ -28,6 +30,7 @@ POST {baseUrl}/delete_user
 | Body |  |  |
 
 ## Update user 
+(not implemented yet, todo)
 POST {baseUrl}/update_user
 
 |  | Request          | Header          |
@@ -46,6 +49,7 @@ POST {baseUrl}/get_userid
 | Body |  | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
 
 ## Register sensor 
+(not implemented yet, todo)
 POST {baseUrl}/add_sensor
 
 |  | Request          | Header          |
@@ -56,82 +60,52 @@ POST {baseUrl}/add_sensor
 Units should be registered directly on code  (°F and °C) or stored in data base a prescaler/offset should be stored on the server. Some predefined values are "AU" (arbitrary unit) and "None" (for ratio).
 
 ## Edit sensor 
+(not implemented yet, todo)
 POST {baseUrl}/edit_sensor
-	Request	Response
-HTTP Code		200 : OK
-406 : Unknow unit
-409 : Already existant
-Headers	Default Auth header	
-Body	{
-"SensorID" : 12,
-"Name": "Temp. Garage",
-"Unit": "°C"
-}
-	{
-"SensorID" : 12
-} 
-On HTTP code 4XX : no body
+
+|  | Request          | Header          |
+| ------------- | ----------- | ----------- |
+| HTTP code      |  | 200 : OK <br/> 406 : Unknow unit <br/> 409 : Already existant |
+| Headers | Default Auth header |  |
+| Body | { <br/> "SensorID" : 12, <br/> "Name": "Temp. Garage", <br/> "Unit": "°C" <br/> } | { <br/> "SensorID" : 12 <br/> } <br/> On HTTP code 4XX/5XX : no body |
 
 ## List sensors 
+(not implemented yet, todo)
 POST {baseUrl}/list_sensor
-	Request	Response
-HTTP Code		200 : Created
-Headers	Default Auth header	
-Body		[{
-"SensorID" : 12,
-"Name": "Temp. Garage",
-"Unit": "°C"
-},
-{
-"SensorID" : 12,
-"Name": "Luminosity",
-"Unit": "AU"
-}]
+
+|  | Request          | Header          |
+| ------------- | ----------- | ----------- |
+| HTTP code      |  | 200 : OK  |
+| Headers | Default Auth header |  |
+| Body |  | [{ <br/> "SensorID" : 12, <br/> "Name": "Temp. Garage", <br/> "Unit": "°C" <br/> }, <br/> { <br/> "SensorID" : 14, <br/> "Name": "Luminosity", <br/> "Unit": "AU" <br/> }] <br/> On HTTP code 4XX/5XX : no body |
 
 ## Delete sensor and data 
+(not implemented yet, todo)
 POST {baseUrl}/delete_sensor
-	Request	Response
-HTTP Code		200 : OK
-406 : Unknow sensor
-Headers	Default Auth header	
-Body	{
-"SensorID" : 12
-} 	
+
+|  | Request          | Header          |
+| ------------- | ----------- | ----------- |
+| HTTP code      |  | 200 : OK <br/> 406 : Unknow sensor |
+| Headers | Default Auth header |  |
+| Body | { <br/> "SensorID" : 12 <br/>} |  |
 
 ## Post sensor data
+(not implemented yet, todo)
 POST {baseUrl}/post_data
-	Request	Response
-Headers	Default Auth header	200 : OK
-406 : Unknow sensor
-409 : Timestamp too close
-Body	[{
-"Timestamp" : 231443252364
-"SensorID" : 12,
-"Value": 3.14159
-},
-{
-"Timestamp" : 231443252364
-"SensorID" : 12,
-"Value": 3.14159
-}]	
+
+|  | Request          | Header          |
+| ------------- | ----------- | ----------- |
+| HTTP code      |  | 200 : OK <br/> 406 : Unknow sensor |
+| Headers | Default Auth header |  |
+| Body | [{ <br/> "Timestamp" : 231443252364, <br/> "SensorID" : 12, <br/> "Value": 3.14159 <br/> }, <br/> { <br/> "Timestamp" : 231443232464,  <br/> "SensorID" : 12, <br/> "Value": 3.14159 <br/> }] |  |
 
 ## Get sensor data
+(not implemented yet, todo)
 POST {baseUrl}/get_data
-	Request	Response
-Headers	Default Auth header	200 : OK
-406 : Unknow sensor
-412 : Invalid range
-416 : Too many data in range
-418 : Max element too large
-Body	{
-"StartTimestamp" : 231443252364
-"EndTimestamp" : 231443290954
-"SensorID" : 12,
-"MaxElements" : 200
-}
-	{
-"Timestamp": [231443252364, 231443280954] ,
-"Value": [3.14159, 5.042]
-} 
-On HTTP code 4XX : no body
+
+|  | Request          | Header          |
+| ------------- | ----------- | ----------- |
+| HTTP code      |  | 200 : OK <br/> 406 : Unknow sensor <br/> 416 : Too many data in range <br/> 418 : Max element too large |
+| Headers | Default Auth header |  |
+| Body | { <br/> "StartTimestamp" : 231443252364 <br/> "EndTimestamp" : 231443290954 <br/> "SensorID" : 12, <br/> "MaxElements" : 200 <br/> } | { <br/> "Timestamp": [231443252364, 231443280954], <br/> "Value": [3.14159, 5.042] <br/> }  <br/> On HTTP code 4XX/5XX : no body  |
 If the number of sample is higher than "MaxElements", sample are averaged within timestamp intervals.
