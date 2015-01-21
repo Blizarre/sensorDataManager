@@ -31,7 +31,7 @@ function mainServerParser(req, res) {
 	    if (authStatus>=0)
 	    {
     	        res.writeHead(200);
-                res.write('{"UserID" :'+ authStatus +'}');
+                res.write('{"UserID" : '+ authStatus +' }');
     		res.end();
 	    }
 	    else if (authStatus==-1) 
