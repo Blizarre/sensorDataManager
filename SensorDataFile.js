@@ -2,23 +2,35 @@
 
 var fs = require('fs');
 
-
-var SensorDataFile = function(fileNameTemplate, maxRowBeforeFlush) {
+/**
+ * onError is called with an error message as argument
+ */
+var SensorDataFile = function(fileNameTemplate, maxRowBeforeFlush, onError) {
 	this.fileNameTemplate = fileNameTemplate;
 	this.maxRowBeforeFlush = maxRowBeforeFlush;
+	this.onError = onError;
+
+	this.currentFileName = null;
+	this.currentTmpFileName = null;
 	this.reset();
 };
 
 
 /**
- * Reset the object to a clean state, ready to handle data after a file flush
+ * Reset the object to a clean state
  */
 SensorDataFile.prototype.reset = function() {
-	this.isAvailable = true;
+	this.isFlushing = false;
 	this.fd = null;
-	this.currentFileName = null;
-	this.currentTmpFileName = null;
 	this.currentRowNumber = 0;
+};
+
+/**
+ * Call the error callback if provided
+ */
+SensorDataFile.prototype.callErrorCallback = function(message) {
+	if(this.onError)
+		this.onError(message);
 };
 
 /**
@@ -26,7 +38,7 @@ SensorDataFile.prototype.reset = function() {
  * open for writing. May throw (string) if the previous file has not been properly closed.
  **/
 SensorDataFile.prototype.openNewFile = function() {
-	if (this.currentFileName || this.currentTmpFileName)
+	if (this.isFlushing)
 		throw "previous file not finished";
 
 	this.currentFileName = this.fileNameTemplate.replace("{timestamp}", Date.now());
@@ -36,38 +48,47 @@ SensorDataFile.prototype.openNewFile = function() {
 
 /**
  * Flush the current logging file. Note: no new data can be added until all the data is securely written to disk.
- * (isAvailable is set to false)
+ * (isFlushing is set to true  until data written and then is set false)
  **/
 SensorDataFile.prototype.flushCurrentLog = function() {
+	this.isFlushing = true;
 	this.fd.end();
-	this.isAvailable = false;
 	var theObj = this;
 	this.fd.on('finish', function() {
 		console.log("File writing complete, moving temp file " + theObj.currentTmpFileName + " to " + theObj.currentFileName);
-		fs.renameSync(theObj.currentTmpFileName, theObj.currentFileName);
-		theObj.reset();
+
+		fs.rename(theObj.currentTmpFileName, theObj.currentFileName, function(error) {
+			theObj.reset();
+			if (error)
+				theObj.callErrorCallback(error);
+		});
 	});
 };
 
 /**
- * Add the data to the current file.
+ * Add the data to the current file
  **/
 SensorDataFile.prototype.addData = function(data) {
-	// If there was a flush at the last call of this function, check that is is finished
-	if (!this.isAvailable)
-		throw "Couldn't flush the previous file in time";
+	try {
+		// If there was a flush at the last call of this function, check that is is finished
+		if (this.isFlushing)
+			this.callErrorCallback("Couldn't flush the previous file in time");
+		else {
+			// If the current file is not defined (or if the flush occured at the last call), create a new one
+			if (!this.fd)
+				this.openNewFile();
 
-	// If the current file is not defined (or if the flush occured at the last call), create a new one
-	if (!this.fd)
-		this.openNewFile();
+			// write the data to the stream
+			this.fd.write(data, "utf-8");
+			this.currentRowNumber++;
 
-	// write the data to the stream
-	this.fd.write(data, "utf-8");
-	this.currentRowNumber++;
-
-	// Flush the file if needed
-	if (this.currentRowNumber >= this.maxRowBeforeFlush)
-		this.flushCurrentLog();
+			// Flush the file if needed
+			if (this.currentRowNumber >= this.maxRowBeforeFlush)
+				this.flushCurrentLog();
+		}
+	} catch (e) {
+		this.callErrorCallback(e);
+	}
 };
 
 

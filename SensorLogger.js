@@ -51,6 +51,10 @@ function parseSensorData(args, callback) {
 	});
 }
 
+function showError(message) 
+{
+	console.error(message);
+}
 
 function extractAndStoreValue(args, sensorFile) {
 	try {
@@ -66,7 +70,7 @@ function extractAndStoreValue(args, sensorFile) {
 }
 
 var args = validateArgs();
-var sensorFile = new SensorDataFile(args.outputLogFile, args.maxRecordPerFile);
+var sensorFile = new SensorDataFile(args.outputLogFile, args.maxRecordPerFile, showError);
 
 extractAndStoreValue(args, sensorFile);
 setInterval(
