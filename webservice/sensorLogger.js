@@ -1,7 +1,7 @@
 var http = require('http');
 var url = require('url');
 var mysql = require('mysql');
-var userMngr = require('./userMngr.js');
+var UserManager = require('./userMngr.js');
 //var sensorMngr = require('./sensorMngr.js');
 var dataMngr = require('./dataMngr.js');
 
@@ -22,6 +22,9 @@ function mainServerParser(req, res) {
 
   req.setEncoding('utf8');
 
+  var userMng = new UserManager(connectSql, req, res);
+
+
   if (page == '/') {
     res.writeHead(400);
     res.write('This service is not to be used this way.');
@@ -29,14 +32,10 @@ function mainServerParser(req, res) {
   }
   else if (page == '/get_userid')
   {
-    userMngr.verifyUser(connectSql, req.headers, function (httpCode, userid)
-      {
-        res.writeHead(httpCode);
-        if (httpCode==200)
-        {
+    userMng.verifyUser(function (userid) {
+        res.writeHead(200);
         console.log(userid);
-          res.write('{"UserID" : '+ userid +' }');
-        }
+        res.write('{"UserID" : '+ userid +' }');
         res.end();
       });
   }
@@ -75,30 +74,18 @@ function mainServerParser(req, res) {
     res.end();
   }
   else if (page == '/post_data') {
-    userMngr.verifyUser(connectSql, req.headers, function (httpCode, userid)
-      {
-        if (httpCode==200)
-        { 
+    userMng.verifyUser(function (userid) {
           req.on('data', function (chunk) {
-            try
-            {
+            try {
               console.log("BLA");
               var postedData=JSON.parse(chunk);
               console.log(postedData);
               res.end();
-            }
-            catch (err)
-            {
+            } catch (err) {
               res.writeHead(400);
               res.end();
             }
             });
-        }
-        else
-        {
-          res.writeHead(httpCode);
-          res.end();
-        }
       });
 
 
@@ -116,7 +103,6 @@ function mainServerParser(req, res) {
   }
 
 }
-
 
 
 var server = http.createServer(mainServerParser);

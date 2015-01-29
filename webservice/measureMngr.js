@@ -1,3 +1,24 @@
+var setData = function(connection, userID, sensorID, timestamp, value) {
+    console.log('Bonjour !');
+    connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+	if (err) throw err;
+	console.log('The solution is: ', rows[0].solution);
+	});
+
+connection.end();
+}
+
+var getData = function() {
+    console.log('Bye bye !');
+}
+
+exports.setData = setData;
+exports.getData = getData;
+
+
+
+
+
 /*
  * This class manages all the interaction regarding the user management. User creation, identification, ...
  *  
@@ -21,7 +42,7 @@
  *     this is a void function
  *
  * */
-var UserManager = function(sqlConnexion, userRequest, answerWrap) {
+var MeasureManager = function(sqlConnexion, userRequest, answerWrap) {
   this.sqlConn = sqlConnexion;
   this.userRq = userRequest;
   this.ansWrp = answerWrap;
@@ -38,7 +59,7 @@ var UserManager = function(sqlConnexion, userRequest, answerWrap) {
  *     this is a void function
  *
  * */
-UserManager.prototype.onError = function(httpCode) {
+MeasureManager.prototype.onError = function(httpCode) {
   this.ansWrp.writeHead(httpCode);
   this.ansWrp.end();
 };
@@ -58,7 +79,7 @@ UserManager.prototype.onError = function(httpCode) {
  *     this is a void function
  *
  * */
-UserManager.prototype.verifyUser = function(outfun) {
+MeasureManager.prototype.verifyUser = function(outfun) {
   var head=this.userRq.headers;
   if ("authorization" in head) {	
     var n=head["authorization"].indexOf(":");
@@ -87,4 +108,9 @@ UserManager.prototype.verifyUser = function(outfun) {
   }
 }
 
-module.exports = UserManager;
+module.exports = MeasureManager;
+
+
+
+
+
