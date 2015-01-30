@@ -16,8 +16,22 @@ var t_insertdata = function(testNum, validHTTPCode, authheader, userid) {
 
   var req = http.request(options, function(res) {
     console.log(res.statusCode);
+   
+
   });
-  req.write('[{ "Timestamp" : 231443252364, "SensorID" : 12, "Value": 3.14159 }, { "Timestamp" : 231443232464, "SensorID" : 12, "Value": 3.14159 }]');
+
+var now = new Date;
+
+var afewsecago= new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() , 
+      now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()-10, now.getUTCMilliseconds());
+
+  var v=('[{ "Timestamp" : "' + now.toUTCString() +'" , "SensorID" : 1, "Value": ' + Math.random() + ' }, { "Timestamp" : "' + afewsecago.toUTCString() + '" , "SensorID" : 1, "Value": ' + Math.random() + ' }]');
+  console.log(v);
+
+//  var v=('[{ "Timestamp" : "' + now.toUTCString() +'" , "SensorID" : 12, "Value": ' + Math.random() + ' }, { "Timestamp" : "' + afewsecago.toUTCString() + '" , "SensorID" : 12, "Value": ' + Math.random() + ' }]');
+  console.log(v);
+
+  req.write(v);
   req.end();
 }
 

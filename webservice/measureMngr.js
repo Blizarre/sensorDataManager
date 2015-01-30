@@ -1,26 +1,7 @@
-var setData = function(connection, userID, sensorID, timestamp, value) {
-    console.log('Bonjour !');
-    connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
-	if (err) throw err;
-	console.log('The solution is: ', rows[0].solution);
-	});
-
-connection.end();
-}
-
-var getData = function() {
-    console.log('Bye bye !');
-}
-
-exports.setData = setData;
-exports.getData = getData;
-
-
-
 
 
 /*
- * This class manages all the interaction regarding the user management. User creation, identification, ...
+ * This class manages all the interaction regarding the measure management. Adding measures, searching, ...
  *  
  * _Instance variables:_
  *     sqlConn: the mysql object to the database
@@ -66,47 +47,48 @@ MeasureManager.prototype.onError = function(httpCode) {
 
 
 /*
- * Check auth is used to provide the userid of a user provided in "authorization" field
- * and to verify this auth header.
  * 
  * _parameters:_
- *     outfun: the function that manages the answer to client
- *          (one parameter: an int value: the user ID if http code ==200)
  *  
- * _error_: call the error function with the corresponding HTTP code
+ * _error:_ call the error function with the corresponding HTTP code
  *
  * _return value:_
  *     this is a void function
  *
  * */
-MeasureManager.prototype.verifyUser = function(outfun) {
-  var head=this.userRq.headers;
-  if ("authorization" in head) {	
-    var n=head["authorization"].indexOf(":");
-    if ((n<0)||(n>=head["authorization"].length-1)) {
-      this.onError(401,0);
+MeasureManager.prototype.setData = function(userID, postedData) {
+    var shouldEqualLen=0;
+    var curr=this;
+
+    var sensorIDList= new Array();
+    for (key in postedData) {
+      sensorIDList[shouldEqualLen++]=postedData[key]["SensorID"];
     }
-    var login=head["authorization"].substr(0, n);
-    var reqmdp=head["authorization"].substr(n+1);
-    var getUserQuery = "SELECT userid, mdp, MD5(CONCAT(seed," + this.sqlConn.escape(reqmdp) + ")) as reqmdp FROM usertable WHERE login="+ this.sqlConn.escape(login);
-    var curr=this; // no this is not a shitty language :p
-    this.sqlConn.query(getUserQuery, function(err, rows, fields) {
-                  if (err) {
-                  curr.onError(500);
-                  } else if (rows.length==0) {
-                  curr.onError(401);
-                  } else if (rows.length>1) {
-                  curr.onError(500);
-                  } else if (rows[0]["reqmdp"]===rows[0]["mdp"]) {
-                  outfun(rows[0]["userid"]);
-                  } else {
-                  curr.onError(401);
-                  }
-                  });
-  } else {
-    this.onError(401);
-  }
+
+    var uniqueSensorIDList = sensorIDList.filter(function(item, pos) {
+      return sensorIDList.indexOf(item) == pos;
+    });
+
+    var sqlStr="SELECT COUNT(*) as NSENSOR FROM sensortable WHERE";
+    for (key in uniqueSensorIDList) {
+      sqlStr+= " (sensorid = " + this.sqlConn.escape(uniqueSensorIDList[key]) + " AND userid = " +  this.sqlConn.escape(userID) + ") OR";
+    }
+    sqlStr = sqlStr.substr(0, sqlStr.length-2);
+    console.log(sqlStr);
+
+    this.sqlConn.query(sqlStr, function(err, rows, fields) {
+      console.log(rows);
+    	if (err) throw err;
+  	  console.log('The solution is: ', rows[0].solution);
+      curr.ansWrp.writeHead(200);
+      curr.ansWrp.end();
+  	});
+
 }
+
+
+
+
 
 module.exports = MeasureManager;
 

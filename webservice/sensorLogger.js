@@ -3,7 +3,7 @@ var url = require('url');
 var mysql = require('mysql');
 var UserManager = require('./userMngr.js');
 //var sensorMngr = require('./sensorMngr.js');
-var dataMngr = require('./dataMngr.js');
+var MeasureManager = require('./measureMngr.js');
 
 var connectSql = mysql.createConnection({
 host     : 'localhost',
@@ -23,6 +23,7 @@ function mainServerParser(req, res) {
   req.setEncoding('utf8');
 
   var userMng = new UserManager(connectSql, req, res);
+  var measMng = new MeasureManager(connectSql, req, res);
 
 
   if (page == '/') {
@@ -77,19 +78,26 @@ function mainServerParser(req, res) {
     userMng.verifyUser(function (userid) {
           req.on('data', function (chunk) {
             try {
-              console.log("BLA");
               var postedData=JSON.parse(chunk);
-              console.log(postedData);
-              res.end();
+              for (key in postedData) {
+                if (!("Timestamp" in postedData[key])) throw 400;	
+                if (!("SensorID" in postedData[key])) throw 400;	
+                if (!("Value" in postedData[key])) throw 400;	
+              }
+
+              //res.writeHead(200);
+              //res.end();
+              measMng.setData(userid, postedData);
             } catch (err) {
+            console.log(err.stack);
               res.writeHead(400);
               res.end();
             }
             });
       });
+    //measMng
 
-
-    res.write('');
+    //res.write('');
   }
   else if (page == '/get_data') {
     res.writeHead(200);
