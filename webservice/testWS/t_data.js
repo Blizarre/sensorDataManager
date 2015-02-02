@@ -25,7 +25,10 @@ var now = new Date;
 var afewsecago= new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate() , 
       now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds()-10, now.getUTCMilliseconds());
 
-  var v=('[{ "Timestamp" : "' + now.toUTCString() +'" , "SensorID" : 1, "Value": ' + Math.random() + ' }, { "Timestamp" : "' + afewsecago.toUTCString() + '" , "SensorID" : 1, "Value": ' + Math.random() + ' }]');
+var now_string=now.toISOString().replace('T', ' ').slice(0, 23)+"000";
+var afewsecago_string=afewsecago.toISOString().replace('T', ' ').slice(0, 23)+"000";
+
+  var v=('[{ "Timestamp" : "' + now_string +'" , "SensorID" : 1, "Value": ' + Math.random() + ' }, { "Timestamp" : "' + afewsecago_string + '" , "SensorID" : 1, "Value": ' + Math.random() + ' }]');
   console.log(v);
 
 //  var v=('[{ "Timestamp" : "' + now.toUTCString() +'" , "SensorID" : 12, "Value": ' + Math.random() + ' }, { "Timestamp" : "' + afewsecago.toUTCString() + '" , "SensorID" : 12, "Value": ' + Math.random() + ' }]');

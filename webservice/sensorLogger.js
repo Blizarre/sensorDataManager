@@ -23,7 +23,6 @@ function mainServerParser(req, res) {
   req.setEncoding('utf8');
 
   var userMng = new UserManager(connectSql, req, res);
-  var measMng = new MeasureManager(connectSql, req, res);
 
 
   if (page == '/') {
@@ -75,6 +74,7 @@ function mainServerParser(req, res) {
     res.end();
   }
   else if (page == '/post_data') {
+    var measMng = new MeasureManager(connectSql, req, res);
     userMng.verifyUser(function (userid) {
           req.on('data', function (chunk) {
             try {

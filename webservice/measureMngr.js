@@ -1,5 +1,3 @@
-
-
 /*
  * This class manages all the interaction regarding the measure management. Adding measures, searching, ...
  *  
@@ -57,33 +55,38 @@ MeasureManager.prototype.onError = function(httpCode) {
  *
  * */
 MeasureManager.prototype.setData = function(userID, postedData) {
-    var shouldEqualLen=0;
-    var curr=this;
+  var SensorManager = require('./sensorMngr.js');
+  var sensorMng = new SensorManager(this.sqlConn, this.userRq, this.ansWrp);
+  var curr=this;
 
-    var sensorIDList= new Array();
+  var sensorIDList= new Array();
+  for (key in postedData) {
+    sensorIDList[key]=postedData[key]["SensorID"];
+  }
+
+  sensorMng.verifySensorList(userID, sensorIDList, function() {
+    var sqlStr="INSERT INTO datatable (userid,sensorid,timestamp,datavalue) VALUES ";
     for (key in postedData) {
-      sensorIDList[shouldEqualLen++]=postedData[key]["SensorID"];
+      sqlStr+= "('" + userID + "','" + curr.sqlConn.escape(postedData[key]["SensorID"]) + "'," +  curr.sqlConn.escape(postedData[key]["Timestamp"]) + ",'" + curr.sqlConn.escape(postedData[key]["Value"])  + "'),";
     }
+    sqlStr = sqlStr.substr(0, sqlStr.length-1);
 
-    var uniqueSensorIDList = sensorIDList.filter(function(item, pos) {
-      return sensorIDList.indexOf(item) == pos;
-    });
+console.log(sqlStr);
+    curr.sqlConn.query(sqlStr, function(err, rows, fields) {
+    	if (err) {
+        curr.onError(500);
+        return;
+      }
 
-    var sqlStr="SELECT COUNT(*) as NSENSOR FROM sensortable WHERE";
-    for (key in uniqueSensorIDList) {
-      sqlStr+= " (sensorid = " + this.sqlConn.escape(uniqueSensorIDList[key]) + " AND userid = " +  this.sqlConn.escape(userID) + ") OR";
-    }
-    sqlStr = sqlStr.substr(0, sqlStr.length-2);
-    console.log(sqlStr);
+console.log(err);
+console.log(rows);
+console.log(fields);
 
-    this.sqlConn.query(sqlStr, function(err, rows, fields) {
-      console.log(rows);
-    	if (err) throw err;
-  	  console.log('The solution is: ', rows[0].solution);
-      curr.ansWrp.writeHead(200);
-      curr.ansWrp.end();
+numRows = rows.affectedRows;
+console.log(numRows);
+        curr.onError(200);
   	});
-
+  });
 }
 
 
