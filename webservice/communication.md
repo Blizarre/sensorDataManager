@@ -95,7 +95,7 @@ POST {baseUrl}/post_data
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
-| HTTP code      |  | 200 : OK <br/> 406 : Unknow sensor |
+| HTTP code      |  | 200 : OK <br/> 409 : Duplicate sensorID/Time <br/> 406 : Unknow sensor <br/>400: some fields are missing <br/> (500: if misformated (ex: Value as text)) |
 | Headers | Default Auth header |  |
 | Body | [{ <br/> "Timestamp" : 231443252364, <br/> "SensorID" : 12, <br/> "Value": 3.14159 <br/> }, <br/> { <br/> "Timestamp" : 231443232464,  <br/> "SensorID" : 12, <br/> "Value": 3.14159 <br/> }] |  |
 

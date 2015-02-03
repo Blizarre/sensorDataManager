@@ -61,10 +61,6 @@ SensorManager.prototype.verifySensorList = function(userID, listSensor, outfun) 
         curr.onError(500);
         return;
       }
-console.log(sqlStr);
-console.log('The solution is: ', rows[0]["NSENSOR"]);
-console.log(rows);
-console.log(shouldEqualLen);
       if (rows[0]["NSENSOR"]==shouldEqualLen) {
         outfun();
       } else {

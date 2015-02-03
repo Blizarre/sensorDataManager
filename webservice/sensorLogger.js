@@ -15,15 +15,12 @@ connectSql.connect();
 
 function mainServerParser(req, res) {
   var page = url.parse(req.url).pathname;	
-  console.log("----====----");
-  console.log(page);
-  console.log(" ");
-  console.log(req.headers);
+  console.log("R: " + page);
+//  console.log(req.headers);
 
   req.setEncoding('utf8');
 
   var userMng = new UserManager(connectSql, req, res);
-
 
   if (page == '/') {
     res.writeHead(400);
@@ -84,12 +81,10 @@ function mainServerParser(req, res) {
                 if (!("SensorID" in postedData[key])) throw 400;	
                 if (!("Value" in postedData[key])) throw 400;	
               }
-
               //res.writeHead(200);
               //res.end();
               measMng.setData(userid, postedData);
             } catch (err) {
-            console.log(err.stack);
               res.writeHead(400);
               res.end();
             }

@@ -71,31 +71,24 @@ MeasureManager.prototype.setData = function(userID, postedData) {
     }
     sqlStr = sqlStr.substr(0, sqlStr.length-1);
 
-console.log(sqlStr);
     curr.sqlConn.query(sqlStr, function(err, rows, fields) {
-    	if (err) {
-        curr.onError(500);
+      if (err) {
+        if (err["errno"]==1062)
+        {
+          curr.onError(409);
+        }
+        else
+        {
+          curr.onError(500);
+        }
         return;
       }
-
-console.log(err);
-console.log(rows);
-console.log(fields);
-
-numRows = rows.affectedRows;
-console.log(numRows);
-        curr.onError(200);
+      curr.ansWrp.writeHead(200);
+      curr.ansWrp.end();
   	});
   });
 }
 
 
-
-
-
 module.exports = MeasureManager;
-
-
-
-
 
