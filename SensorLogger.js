@@ -9,13 +9,15 @@ function validateArgs() {
 	var args = minimist(process.argv.slice(2), {
 		"default": {
 			"interval": 15000,
-			"maxRecordPerFile": 2
+			"maxRecordPerFile": 2,
+			"outputLogFile": "out{timestamp}.csv"
 		},
 		"string": ["sensorFile"]
 	});
 
 	if (args.help || args._.length !== 0) {
-		console.error( "Usage: node " + process.argv[1] + " --sensorFile <fileName> --sensorId <string> [ --interval <sampling interval in s.> --maxRecordPerFile <int> ]");
+		console.error( "Usage: node " + process.argv[1] + " --sensorFile <fileName> --sensorId <string> [ --outputLogFile <fileNamePattern> --interval <sampling interval in s.> --maxRecordPerFile <int> ]");
+		console.error( " - outputLogFile : must contains {timestamp} that will be replaced by the current time. default: \"out{timestamp}.csv\" ");
 		process.exit();
 		}
 
@@ -26,7 +28,6 @@ function validateArgs() {
 	if (!args.sensorId) {
 		throw "--sensorId required";
 	}
-	args.outputLogFile = args.outputLogFile || "out{timestamp}.csv";
 
 	return args;
 }
@@ -34,7 +35,7 @@ function validateArgs() {
 function parseSensorData(args, callback) {
 	var value;
 	fs.readFile(args.sensorFile, {
-		"encoding": "utf-8"
+		"encoding": "ansi"
 	}, function(err, data) {
 		if (err)
 			throw err;
