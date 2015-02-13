@@ -25,24 +25,46 @@ var SensorManager = function(sqlConnexion, userRequest, answerWrap) {
   this.sqlConn = sqlConnexion;
   this.userRq = userRequest;
   this.ansWrp = answerWrap;
+  this.config = require('./config.js');
 };
 
 
 /*
- * Error function that replies to the user the HTTP code provided
+ * Function that replies to the user the HTTP code provided
  * 
  * _parameters:_
  *     httpCode: an int that corresponds to the HTTP code to be returned
+ *     body: the text to reply
+ *     header: an associative array corresponding to the headers
  *  
  * _return value:_
  *     this is a void function
  *
  * */
-SensorManager.prototype.onError = function(httpCode) {
-  this.ansWrp.writeHead(httpCode);
-  this.ansWrp.end();
-};
+SensorManager.prototype.replyUser = function(httpCode, body, header) {
+  ansheader = this.config.answer_static_header;
+  for(item in header) {
+    ansheader[item] = header[item];
+  }
+  this.ansWrp.writeHead(httpCode, ansheader);
 
+  if (body) {
+    this.ansWrp.write(body);
+  }
+  this.ansWrp.end();
+}
+
+
+/*
+ * 
+ * _parameters:_
+ *  
+ * _error:_ call the error function with the corresponding HTTP code
+ *
+ * _return value:_
+ *     this is a void function
+ *
+ * */
 SensorManager.prototype.verifySensorList = function(userID, listSensor, outfun) {
     var curr=this;
     var uniqueSensorIDList = listSensor.filter(function(item, pos) {
@@ -58,16 +80,15 @@ SensorManager.prototype.verifySensorList = function(userID, listSensor, outfun) 
 
     this.sqlConn.query(sqlStr, function(err, rows, fields) {
     	if (err) {
-        curr.onError(500);
+        curr.replyUser(500);
         return;
       }
       if (rows[0]["NSENSOR"]==shouldEqualLen) {
         outfun();
       } else {
-        curr.onError(406);
+        curr.replyUser(406);
       }
   	});
-
 }
 
 module.exports = SensorManager;

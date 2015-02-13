@@ -8,6 +8,7 @@ var t_login = function(testNum, validHTTPCode, authheader, userid)
       port: 1337,
       path: '/get_userid',
       method: 'POST',
+      agent:false,
       headers: { 'authorization': authheader }
   };
 

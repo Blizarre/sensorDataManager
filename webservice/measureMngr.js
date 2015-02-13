@@ -25,23 +25,34 @@ var MeasureManager = function(sqlConnexion, userRequest, answerWrap) {
   this.sqlConn = sqlConnexion;
   this.userRq = userRequest;
   this.ansWrp = answerWrap;
+  this.config = require('./config.js');
 };
 
 
 /*
- * Error function that replies to the user the HTTP code provided
+ * Function that replies to the user the HTTP code provided
  * 
  * _parameters:_
  *     httpCode: an int that corresponds to the HTTP code to be returned
+ *     body: the text to reply
+ *     header: an associative array corresponding to the headers
  *  
  * _return value:_
  *     this is a void function
  *
  * */
-MeasureManager.prototype.onError = function(httpCode) {
-  this.ansWrp.writeHead(httpCode);
+MeasureManager.prototype.replyUser = function(httpCode, body, header) {
+  ansheader = this.config.answer_static_header;
+  for(item in header) {
+    ansheader[item] = header[item];
+  }
+  this.ansWrp.writeHead(httpCode, ansheader);
+
+  if (body) {
+    this.ansWrp.write(body);
+  }
   this.ansWrp.end();
-};
+}
 
 
 /*
@@ -75,16 +86,82 @@ MeasureManager.prototype.setData = function(userID, postedData) {
       if (err) {
         if (err["errno"]==1062)
         {
-          curr.onError(409);
+          curr.replyUser(409);
         }
         else
         {
-          curr.onError(500);
+          curr.replyUser(500);
         }
         return;
       }
-      curr.ansWrp.writeHead(200);
-      curr.ansWrp.end();
+      curr.replyUser(200);
+  	});
+  });
+}
+
+
+/*
+ * 
+ * _parameters:_
+ *  
+ * _error:_ call the error function with the corresponding HTTP code
+ *
+ * _return value:_
+ *     this is a void function
+ *
+ * */
+// TODO: do some histograms with group by min/max
+// faire un fichier de conf limiter les réponses comparer à un nombre
+MeasureManager.prototype.getData = function(userID, postedData) {
+  var SensorManager = require('./sensorMngr.js');
+  var sensorMng = new SensorManager(this.sqlConn, this.userRq, this.ansWrp);
+  var curr=this;
+
+  var sensorIDList= new Array();
+  sensorIDList[0]=postedData["SensorID"];
+  sensorMng.verifySensorList(userID, sensorIDList, function() {
+    var sqlStr="SELECT COUNT(datavalue) as cnt , MIN(datavalue) as minVal, MAX(datavalue) as maxVal FROM datatable WHERE userid='"+ userID + "' AND sensorid="+ curr.sqlConn.escape(postedData["SensorID"]) +" AND timestamp>="+ curr.sqlConn.escape(postedData["StartTimestamp"])+" AND timestamp<="+ curr.sqlConn.escape(postedData["EndTimestamp"]);
+    curr.sqlConn.query(sqlStr, function(err, rows, fields) {
+      console.log(err);
+      console.log(rows);
+      //console.log(fields);
+      console.log(sqlStr);
+      if (err)
+      {
+         curr.replyUser(500);
+         return;
+      }
+      if ((rows[0]["cnt"]>postedData["MaxElements"]) || (rows[0]["cnt"]>curr.config.get_data_max_entries)) {
+        curr.replyUser(432);
+        return;
+        var sqlStr="SELECT timestamp, datavalue  FROM datatable WHERE userid='"+ userID + "' AND sensorid="+ curr.sqlConn.escape(postedData["SensorID"]) +" AND timestamp>="+ curr.sqlConn.escape(postedData["StartTimestamp"])+" AND timestamp<="+ curr.sqlConn.escape(postedData["EndTimestamp"])+" ORDER BY timestamp";
+      } else {
+        // Answer is short enought
+        var sqlStr="SELECT timestamp, datavalue  FROM datatable WHERE userid='"+ userID + "' AND sensorid="+ curr.sqlConn.escape(postedData["SensorID"]) +" AND timestamp>="+ curr.sqlConn.escape(postedData["StartTimestamp"])+" AND timestamp<="+ curr.sqlConn.escape(postedData["EndTimestamp"])+" ORDER BY timestamp";
+      }
+      curr.sqlConn.query(sqlStr, function(err, rows, fields) {
+        console.log(err);
+        console.log(rows);
+        //console.log(fields);
+        console.log(sqlStr);
+        if (err)
+        {
+          curr.replyUser(500);
+          return;
+        }
+        
+        var retData;
+        retData={
+          "Timestamp" : [],
+          "Value" : []
+        }
+        for (entry in rows)
+        {
+          retData["Timestamp"].push(rows[entry]["timestamp"]);
+          retData["Value"].push(rows[entry]["datavalue"]);
+        }
+        curr.replyUser(200, JSON.stringify(retData)); 
+      });
   	});
   });
 }

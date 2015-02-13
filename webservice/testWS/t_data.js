@@ -70,6 +70,26 @@ var t_insertdata = function(testNum, validHTTPCode, authheader, sensorID0, senso
   req.end();
 }
 
+// **************************
+// **************************
+// **   Data Insersion     **
+// **************************
+// **************************
+console.log("**   Data Insersion     **");
+// add code for corrupted data/ partiellement correct
+// code retour 500 en case de date identique
+//t_insertdata(0, 200, "test:test", 1, 1, 0, true);
+//t_insertdata(1, 401, "test:testz", 1, 1, 0, true);
+//t_insertdata(2, 401, "testz:test", 1, 1, 0, true);
+//t_insertdata(3, 200, "test:test", 1, 1, 1, true);
+//t_insertdata(4, 409, "test:test", 1, 1, 2, true);
+//t_insertdata(5, 409, "test:test", 1, 1, 3, true); // should be false on first because return is 200
+//t_insertdata(6, 200, "test:test", 1, 2, 0, true);
+//t_insertdata(7, 406, "test:test", 80085, 80085, 0, true);
+//t_insertdata(8, 406, "test:test", 1, 80085, 0, true);
+//t_insertdata(9, 406, "test:test", 80085, 1, 0, true);
+//t_insertdata(10, 200, "test:test", 1, 1, 0, false);
+
 
 var t_readdata = function(testNum, authheader, sensorID, date1, date2, maxElem) {
   var options = {
@@ -86,14 +106,20 @@ var t_readdata = function(testNum, authheader, sensorID, date1, date2, maxElem) 
   var valid = true;
 
   var req = http.request(options, function(res) {
-    //console.log(res.statusCode);
+    console.log(res.statusCode);
+
+    res.on("data", function(chunk) {
+      console.log("body: " + chunk);
+    });
+    return;
     if (res.statusCode!=200)
     { 
-      console.log("Test "+ testNum + ": Error " + valid) ;
+      console.log("Test "+ testNum + ": Error: " + valid);
+      return;
     }
 
     res.on("data", function(chunk) {
-      console.log("BODY: " + chunk);
+      console.log("body: " + chunk);
 
 
       var postedData=JSON.parse(chunk);
@@ -110,34 +136,14 @@ var t_readdata = function(testNum, authheader, sensorID, date1, date2, maxElem) 
 
   });
 
-  var msg='{ "StartTimestamp" : ' + date1 + ', "EndTimestamp" : ' + date2 + ', "SensorID" : ' + sensorID + ', "MaxElements" : ' + maxElem + ' }';
+  date1_str=date1.toISOString().replace('T', ' ').slice(0, 23)+"000";
+  date2_str=date2.toISOString().replace('T', ' ').slice(0, 23)+"000";
+  var msg='{ "StartTimestamp" : "' + date1_str + '", "EndTimestamp" : "' + date2_str + '", "SensorID" : ' + sensorID + ', "MaxElements" : ' + maxElem + ' }';
 
   //console.log(msg);
   req.write(msg);
   req.end();
 }
-
-
-// **************************
-// **************************
-// **   Data Insersion     **
-// **************************
-// **************************
-console.log("**   Data Insersion     **");
-// add code for corrupted data/ partiellement correct
-// code retour 500 en case de date identique
-t_insertdata(0, 200, "test:test", 1, 1, 0, true);
-t_insertdata(1, 401, "test:testz", 1, 1, 0, true);
-t_insertdata(2, 401, "testz:test", 1, 1, 0, true);
-t_insertdata(3, 200, "test:test", 1, 1, 1, true);
-t_insertdata(4, 409, "test:test", 1, 1, 2, true);
-t_insertdata(5, 409, "test:test", 1, 1, 3, true); // should be false on first because return is 200
-t_insertdata(6, 200, "test:test", 1, 2, 0, true);
-t_insertdata(7, 406, "test:test", 80085, 80085, 0, true);
-t_insertdata(8, 406, "test:test", 1, 80085, 0, true);
-t_insertdata(9, 406, "test:test", 80085, 1, 0, true);
-t_insertdata(10, 200, "test:test", 1, 1, 0, false);
-
 
 // **************************
 // **************************
@@ -145,7 +151,14 @@ t_insertdata(10, 200, "test:test", 1, 1, 0, false);
 // **************************
 // **************************
 console.log("**   Data Readout    **");
-//t_readdata(0, "test:test", );
-
+t_readdata(0, "test:test" , 1, new Date(0), new Date, 200);
+//t_readdata(1, "testz:test", 1, new Date(0), new Date, 200);
+//t_readdata(2, "test:test" , 1, new Date(0), new Date, 10);
+//t_readdata(3, "test:test" , 1, new Date, new Date(0), 2000);
+//t_readdata(4, "test:test" , 1, new Date(0), new Date, 0);
+//t_readdata(5, "test:test" , 1, new Date, new Date, 20);
+//t_readdata(6, "test:test" , 1, new Date(0), new Date(0), 20);
+//t_readdata(7, "test:test" , 2, new Date(0), new Date, 200);
+//t_readdata(8, "test:test" , 80085, new Date(0), new Date, 200);
 
 

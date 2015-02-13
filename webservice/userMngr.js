@@ -9,6 +9,7 @@
  */
 
 
+
 /*
  * Constructor for this class.
  * 
@@ -25,23 +26,34 @@ var UserManager = function(sqlConnexion, userRequest, answerWrap) {
   this.sqlConn = sqlConnexion;
   this.userRq = userRequest;
   this.ansWrp = answerWrap;
+  this.config = require('./config.js');
 };
 
 
 /*
- * Error function that replies to the user the HTTP code provided
+ * Function that replies to the user the HTTP code provided
  * 
  * _parameters:_
  *     httpCode: an int that corresponds to the HTTP code to be returned
+ *     body: the text to reply
+ *     header: an associative array corresponding to the headers
  *  
  * _return value:_
  *     this is a void function
  *
  * */
-UserManager.prototype.onError = function(httpCode) {
-  this.ansWrp.writeHead(httpCode);
+UserManager.prototype.replyUser = function(httpCode, body, header) {
+  ansheader = this.config.answer_static_header;
+  for(item in header) {
+    ansheader[item] = header[item];
+  }
+  this.ansWrp.writeHead(httpCode, ansheader);
+
+  if (body) {
+    this.ansWrp.write(body);
+  }
   this.ansWrp.end();
-};
+}
 
 
 /*
@@ -63,7 +75,7 @@ UserManager.prototype.verifyUser = function(outfun) {
   if ("authorization" in head) {	
     var n=head["authorization"].indexOf(":");
     if ((n<0)||(n>=head["authorization"].length-1)) {
-      this.onError(401,0);
+      this.replyUser(401);
     }
     var login=head["authorization"].substr(0, n);
     var reqmdp=head["authorization"].substr(n+1);
@@ -71,19 +83,19 @@ UserManager.prototype.verifyUser = function(outfun) {
     var curr=this; // no this is not a shitty language :p
     this.sqlConn.query(getUserQuery, function(err, rows, fields) {
                   if (err) {
-                  curr.onError(500);
+                  curr.replyUser(500);
                   } else if (rows.length==0) {
-                  curr.onError(401);
+                  curr.replyUser(401);
                   } else if (rows.length>1) {
-                  curr.onError(500);
+                  curr.replyUser(500);
                   } else if (rows[0]["reqmdp"]===rows[0]["mdp"]) {
                   outfun(rows[0]["userid"]);
                   } else {
-                  curr.onError(401);
+                  curr.replyUser(401);
                   }
                   });
   } else {
-    this.onError(401);
+    this.replyUser(401);
   }
 }
 
