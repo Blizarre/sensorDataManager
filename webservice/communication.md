@@ -17,7 +17,7 @@ PUT {baseUrl}/user
 | ------------- | ----------- | ----------- |
 | HTTP code      |  | 201 : Created <br/> 409 : Already existant |
 | Headers | Default Auth header |  |
-| Body |  | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
+| Body |  { <br/> "Login": "Plop", <br/> "Password": "Kwain" <br/> } | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
 
 ## Delete user
 (not implemented yet, todo)
