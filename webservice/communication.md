@@ -75,7 +75,7 @@ PATCH {baseUrl}/sensor
 
 ## List sensors 
 (not implemented yet, todo)
-GET {baseUrl}/sensor
+POST {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -94,7 +94,7 @@ DELETE {baseUrl}/sensor
 | Body | { <br/> "SensorID" : 12 <br/>} |  |
 
 ## Post sensor data
-POST {baseUrl}/data
+PUT {baseUrl}/data
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -104,7 +104,7 @@ POST {baseUrl}/data
 
 ## Get sensor data
 (not implemented yet, todo)
-GET {baseUrl}/data
+POST {baseUrl}/data
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
