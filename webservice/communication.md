@@ -8,6 +8,7 @@ Authorization : login:password <br/>
 UserID: userid (if known) <br/> 
 Incorrect auth data will result in a 401 error. _Later_ a cookie style auth can be adder for sending data. Example: headders "Cookie: MD5(timestamp+sensorID+seedprovided) userid: userid" can be used to authentificate. <br/> 
 Server error are not presents in the following response HTTP codes but can occur.
+All JSON data not required will be discarded without notice
 
 ## Create user
 (not implemented yet, todo)
@@ -18,6 +19,7 @@ PUT {baseUrl}/user
 | HTTP code      |  | 201 : Created <br/> 409 : Already existant |
 | Headers | Default Auth header |  |
 | Body |  { <br/> "Login": "Plop", <br/> "Password": "Kwain" <br/> } | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
+Only an administrator or the current user can use this method
 
 ## Delete user
 (not implemented yet, todo)
@@ -28,6 +30,7 @@ DELETE {baseUrl}/user
 | HTTP code      |  | 200 : OK  |
 | Headers | Default Auth header |  |
 | Body |  |  |
+Only an administrator or the current user can use this method
 
 ## Update user 
 (not implemented yet, todo)
