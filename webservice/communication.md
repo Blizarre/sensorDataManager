@@ -11,7 +11,7 @@ Server error are not presents in the following response HTTP codes but can occur
 All JSON data not required will be discarded without notice
 
 ## Create user
-(not implemented yet, todo)
+(not tested yet, todo)
 PUT {baseUrl}/user
 
 |  | Request          | Header          |
@@ -22,7 +22,7 @@ PUT {baseUrl}/user
 Only an administrator or the current user can use this method
 
 ## Delete user
-(not implemented yet, todo)
+(not tested yet, todo)
 DELETE {baseUrl}/user
 
 |  | Request          | Header          |
@@ -30,7 +30,7 @@ DELETE {baseUrl}/user
 | HTTP code      |  | 200 : OK  |
 | Headers | Default Auth header |  |
 | Body |   { <br/> "UserID" : 69 <br/> }  |  |
-Only an administrator or the current user can use this method
+Only an administrator (in this case, code 409 is not found) or the current user can use this method
 
 ## Update user 
 (not implemented yet, todo)
@@ -41,6 +41,7 @@ PATCH {baseUrl}/user
 | HTTP code      |  | 200 : OK <br/> 409 : Name already exists |
 | Headers | Default Auth header (the previous set) |  |
 | Body | { <br/> "Login": "Plop", <br/> "Password": "Kwain" <br/> } | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
+Only an administrator or the current user can use this method
 
 ## Get user id
 GET {baseUrl}/userid
