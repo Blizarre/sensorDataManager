@@ -11,7 +11,7 @@ Server error are not presents in the following response HTTP codes but can occur
 
 ## Create user
 (not implemented yet, todo)
-POST {baseUrl}/create_user
+PUT {baseUrl}/user
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -21,7 +21,7 @@ POST {baseUrl}/create_user
 
 ## Delete user
 (not implemented yet, todo)
-POST {baseUrl}/delete_user
+DELETE {baseUrl}/user
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -31,7 +31,7 @@ POST {baseUrl}/delete_user
 
 ## Update user 
 (not implemented yet, todo)
-POST {baseUrl}/update_user
+PATCH {baseUrl}/user
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -40,7 +40,7 @@ POST {baseUrl}/update_user
 | Body | { <br/> "Login": "Plop", <br/> "Password": "Kwain" <br/> } | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
 
 ## Get user id
-POST {baseUrl}/get_userid
+GET {baseUrl}/userid
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -50,7 +50,7 @@ POST {baseUrl}/get_userid
 
 ## Register sensor 
 (not implemented yet, todo)
-POST {baseUrl}/add_sensor
+PUT {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -61,7 +61,7 @@ Units should be registered directly on code  (°F and °C) or stored in data bas
 
 ## Edit sensor 
 (not implemented yet, todo)
-POST {baseUrl}/edit_sensor
+PATCH {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -71,7 +71,7 @@ POST {baseUrl}/edit_sensor
 
 ## List sensors 
 (not implemented yet, todo)
-POST {baseUrl}/list_sensor
+GET {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -81,7 +81,7 @@ POST {baseUrl}/list_sensor
 
 ## Delete sensor and data 
 (not implemented yet, todo)
-POST {baseUrl}/delete_sensor
+DELETE {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -90,8 +90,7 @@ POST {baseUrl}/delete_sensor
 | Body | { <br/> "SensorID" : 12 <br/>} |  |
 
 ## Post sensor data
-(not implemented yet, todo)
-POST {baseUrl}/post_data
+POST {baseUrl}/data
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -101,7 +100,7 @@ POST {baseUrl}/post_data
 
 ## Get sensor data
 (not implemented yet, todo)
-POST {baseUrl}/get_data
+GET {baseUrl}/data
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
