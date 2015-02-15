@@ -29,7 +29,7 @@ DELETE {baseUrl}/user
 | ------------- | ----------- | ----------- |
 | HTTP code      |  | 200 : OK  |
 | Headers | Default Auth header |  |
-| Body |  |  |
+| Body |   { <br/> "UserID" : 69 <br/> }  |  |
 Only an administrator or the current user can use this method
 
 ## Update user 
