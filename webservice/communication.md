@@ -8,39 +8,43 @@ Authorization : login:password <br/>
 UserID: userid (if known) <br/> 
 Incorrect auth data will result in a 401 error. _Later_ a cookie style auth can be adder for sending data. Example: headders "Cookie: MD5(timestamp+sensorID+seedprovided) userid: userid" can be used to authentificate. <br/> 
 Server error are not presents in the following response HTTP codes but can occur.
+All JSON data not required will be discarded without notice
 
 ## Create user
-(not implemented yet, todo)
-POST {baseUrl}/create_user
+(not tested yet, todo)
+PUT {baseUrl}/user
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
 | HTTP code      |  | 201 : Created <br/> 409 : Already existant |
 | Headers | Default Auth header |  |
-| Body |  | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
+| Body |  { <br/> "Login": "Plop", <br/> "Password": "Kwain" <br/> } | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
+Only an administrator or the current user can use this method
 
 ## Delete user
-(not implemented yet, todo)
-POST {baseUrl}/delete_user
+(not tested yet, todo)
+DELETE {baseUrl}/user
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
 | HTTP code      |  | 200 : OK  |
 | Headers | Default Auth header |  |
-| Body |  |  |
+| Body |   { <br/> "UserID" : 69 <br/> }  |  |
+Only an administrator (in this case, code 409 is not found) or the current user can use this method
 
 ## Update user 
 (not implemented yet, todo)
-POST {baseUrl}/update_user
+PATCH {baseUrl}/user
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
 | HTTP code      |  | 200 : OK <br/> 409 : Name already exists |
 | Headers | Default Auth header (the previous set) |  |
 | Body | { <br/> "Login": "Plop", <br/> "Password": "Kwain" <br/> } | { <br/> "UserID" : 69 <br/> } <br/> On HTTP code 4XX/5XX : no body |
+Only an administrator or the current user can use this method
 
 ## Get user id
-POST {baseUrl}/get_userid
+GET {baseUrl}/userid
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -50,7 +54,7 @@ POST {baseUrl}/get_userid
 
 ## Register sensor 
 (not implemented yet, todo)
-POST {baseUrl}/add_sensor
+PUT {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -61,7 +65,7 @@ Units should be registered directly on code  (°F and °C) or stored in data bas
 
 ## Edit sensor 
 (not implemented yet, todo)
-POST {baseUrl}/edit_sensor
+PATCH {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -71,7 +75,7 @@ POST {baseUrl}/edit_sensor
 
 ## List sensors 
 (not implemented yet, todo)
-POST {baseUrl}/list_sensor
+POST {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -81,7 +85,7 @@ POST {baseUrl}/list_sensor
 
 ## Delete sensor and data 
 (not implemented yet, todo)
-POST {baseUrl}/delete_sensor
+DELETE {baseUrl}/sensor
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -90,8 +94,7 @@ POST {baseUrl}/delete_sensor
 | Body | { <br/> "SensorID" : 12 <br/>} |  |
 
 ## Post sensor data
-(not implemented yet, todo)
-POST {baseUrl}/post_data
+PUT {baseUrl}/data
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
@@ -101,7 +104,7 @@ POST {baseUrl}/post_data
 
 ## Get sensor data
 (not implemented yet, todo)
-POST {baseUrl}/get_data
+POST {baseUrl}/data
 
 |  | Request          | Header          |
 | ------------- | ----------- | ----------- |
