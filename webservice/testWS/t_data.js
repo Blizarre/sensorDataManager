@@ -4,8 +4,8 @@ var t_insertdata = function(testNum, validHTTPCode, authheader, sensorID0, senso
   var options = {
     host: '127.0.0.1',
     port: 1337,
-    path: '/post_data',
-    method: 'POST',
+    path: '/data',
+    method: 'PUT',
     agent:false,
     headers: {
       'authorization': authheader
@@ -95,7 +95,7 @@ var t_readdata = function(testNum, authheader, sensorID, date1, date2, maxElem) 
   var options = {
     host: '127.0.0.1',
     port: 1337,
-    path: '/get_data',
+    path: '/data',
     method: 'POST',
     agent:false,
     headers: {
@@ -140,7 +140,7 @@ var t_readdata = function(testNum, authheader, sensorID, date1, date2, maxElem) 
   date2_str=date2.toISOString().replace('T', ' ').slice(0, 23)+"000";
   var msg='{ "StartTimestamp" : "' + date1_str + '", "EndTimestamp" : "' + date2_str + '", "SensorID" : ' + sensorID + ', "MaxElements" : ' + maxElem + ' }';
 
-  //console.log(msg);
+  console.log(msg);
   req.write(msg);
   req.end();
 }

@@ -1,0 +1,37 @@
+<html>
+<script type="text/javascript">
+var login = "test";
+var password = "test";
+var requestJSON= '{ "StartTimestamp" : "1970-01-01 00:00:00.000000", "EndTimestamp" : "2015-02-15 23:32:28.858000", "SensorID" : 1, "MaxElements" : 200 }';
+
+var request;
+
+function go() {
+  var request = new XMLHttpRequest();
+
+  request.open("POST", "//www.famille-blanchard.fr:1337/data");
+
+  request.responseType="json";
+  request.setRequestHeader("authorization", login+":"+password);
+  request.onreadystatechange = 
+    function(){
+      if (request.readyState  == 4) {
+        if ( (request.status != 200) && ( request.status!=0 ) ) {
+          document.write("request status: " + request.status);
+        } else {
+          document.write("answer: " + JSON.stringify(request.response));
+        }
+      }
+    };
+
+  request.send(requestJSON);
+}
+
+</script>
+
+
+<body onload="go()">
+
+</body>
+</html>
+

@@ -119,6 +119,7 @@ MeasureManager.prototype.getData = function(userID, postedData) {
 
   var sensorIDList= new Array();
   sensorIDList[0]=postedData["SensorID"];
+  console.log("4");
   sensorMng.verifySensorList(userID, sensorIDList, function() {
     var sqlStr="SELECT COUNT(datavalue) as cnt , MIN(datavalue) as minVal, MAX(datavalue) as maxVal FROM datatable WHERE userid='"+ userID + "' AND sensorid="+ curr.sqlConn.escape(postedData["SensorID"]) +" AND timestamp>="+ curr.sqlConn.escape(postedData["StartTimestamp"])+" AND timestamp<="+ curr.sqlConn.escape(postedData["EndTimestamp"]);
     curr.sqlConn.query(sqlStr, function(err, rows, fields) {
